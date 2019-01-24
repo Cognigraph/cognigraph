@@ -609,7 +609,13 @@ class MCE(ProcessorNode):
         self.mne_info = None
         self.input_data = []
         self.output = []
-        # pass
+        self._gain_matrix = None
+        self.Un = None
+        self.A_non_ori = None
+        self._mne_info = None
+        self.mne_inv = None
+        self.V = None
+        self.Sn = None
 
     def _initialize(self):
         mne_info = self.traverse_back_and_find('mne_info')
@@ -619,7 +625,7 @@ class MCE(ProcessorNode):
             self.mne_forward_model_file_path, mne_info)
         mne_info['bads'] = list(set(mne_info['bads'] + missing_ch_names))
         fwd_fix = mne.convert_forward_solution(
-                fwd, surf_ori=True, force_fixed=False)
+            fwd, surf_ori=True, force_fixed=False)
 
         self._gain_matrix = fwd_fix['sol']['data']
 
@@ -634,23 +640,22 @@ class MCE(ProcessorNode):
         # ---------------------------------------------------- #
 
         # -------- leadfield dims -------- #
-        N_SEN = self._gain_matrix.shape[0]
+        n_sen = self._gain_matrix.shape[0]
         # -------------------------------- #
 
         # ------------------------ noise-covariance ------------------------ #
-        cov_data = np.identity(N_SEN)
+        cov_data = np.identity(n_sen)
         ch_names = np.array(mne_info['ch_names'])[mne.pick_types(mne_info,
                                                                  eeg=True,
                                                                  meg=False)]
         ch_names = list(ch_names)
-        noise_cov = mne.Covariance(
-                cov_data, ch_names, mne_info['bads'],
-                mne_info['projs'], nfree=1)
+        noise_cov = mne.Covariance(cov_data, ch_names, mne_info['bads'],
+                                   mne_info['projs'], nfree=1)
         # ------------------------------------------------------------------ #
 
         self.mne_inv = mne_make_inverse_operator(
-                mne_info, fwd_fix, noise_cov, depth=0.8,
-                loose=1, fixed=False, verbose='ERROR')
+            mne_info, fwd_fix, noise_cov, depth=0.8,
+            loose=1, fixed=False, verbose='ERROR')
         self._mne_info = mne_info
         self.Sn = Sn
         self.V = V
