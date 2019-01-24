@@ -18,7 +18,7 @@ np.warnings.filterwarnings('ignore')  # noqa
 # ----------------------------- setup logging  ----------------------------- #
 logfile = None
 format = '%(asctime)s:%(name)-17s:%(levelname)s:%(message)s'
-logging.basicConfig(level=logging.DEBUG, filename=logfile, format=format)
+logging.basicConfig(level=logging.INFO, filename=logfile, format=format)
 logger = logging.getLogger(__name__)
 mne.set_log_level('INFO')
 mne.set_log_file(fname=logfile, output_format=format)
@@ -58,10 +58,10 @@ def assemble_pipeline(file_path, inverse_method='mne'):
     pipeline.add_processor(linear_filter)
 
     if inverse_method == 'mne':
-        # inverse_model = processors.InverseModel(method='MNE', snr=1.0,
-        #                                         forward_model_path=fwd_path)
-        inverse_model = processors.MneGcs(snr=1.0, seed=1000,
-                                          forward_model_path=fwd_path)
+        inverse_model = processors.InverseModel(method='MNE', snr=1.0,
+                                                forward_model_path=fwd_path)
+        # inverse_model = processors.MneGcs(snr=1.0, seed=1000,
+        #                                   forward_model_path=fwd_path)
         pipeline.add_processor(inverse_model)
         envelope_extractor = processors.EnvelopeExtractor(0.99)
         pipeline.add_processor(envelope_extractor)
@@ -91,34 +91,36 @@ def assemble_pipeline(file_path, inverse_method='mne'):
     roi_average.input_node = inverse_model
     pipeline.add_processor(roi_average)
 
-    aec = processors.AmplitudeEnvelopeCorrelations(
-        method=None,
-        seed=1000
-        # method='temporal_orthogonalization',
-        # method='geometric_correction',
-        # seed=0
-    )
-    pipeline.add_processor(aec)
-    aec.input_node = inverse_model
-    # coh = processors.Coherence(
-    #     method='coh', seed=0)
-    aec_env = processors.EnvelopeExtractor(0.995)
-    pipeline.add_processor(aec_env)
+    # aec = processors.AmplitudeEnvelopeCorrelations(
+    #     # method=None,
+    #     # seed=1000
+    #     method='temporal_orthogonalization',
+    #     # method='geometric_correction',
+    #     # seed=0
+    # )
+    # pipeline.add_processor(aec)
+    # aec.input_node = inverse_model
+    coh = processors.Coherence(
+        method='coh', seed=None)
+    coh.input_node = roi_average
+    pipeline.add_processor(coh)
+    # aec_env = processors.EnvelopeExtractor(0.995)
+    # pipeline.add_processor(aec_env)
 
-    seed_viewer = outputs.BrainViewer(
-        limits_mode=global_mode, buffer_length=6,
-        surfaces_dir=op.join(SURF_DIR, SUBJECT))
+    # seed_viewer = outputs.BrainViewer(
+    #     limits_mode=global_mode, buffer_length=6,
+    #     surfaces_dir=op.join(SURF_DIR, SUBJECT))
 
-    pipeline.add_output(seed_viewer, input_node=aec_env)
+    # pipeline.add_output(seed_viewer, input_node=aec_env)
 
     # pipeline.add_output(outputs.LSLStreamOutput())
     # signal_viewer = outputs.SignalViewer()
     # signal_viewer_src = outputs.SignalViewer()
     # pipeline.add_output(signal_viewer, input_node=linear_filter)
     # pipeline.add_output(signal_viewer_src, input_node=roi_average)
-    # con_viewer = outputs.ConnectivityViewer(
-    #     surfaces_dir=op.join(SURF_DIR, SUBJECT))
-    # pipeline.add_output(con_viewer, input_node=aec)
+    con_viewer = outputs.ConnectivityViewer(
+        surfaces_dir=op.join(SURF_DIR, SUBJECT))
+    pipeline.add_output(con_viewer, input_node=coh)
     # --------------------------------------------------------------------- #
     return pipeline
 
