@@ -16,7 +16,7 @@ setup(
     install_requires=[
         'pyqtgraph',
         'pyqt5',
-        'mne',
+        'mne<=0.16',
         'scipy>=1.0.0',
         'matplotlib',
         'pylsl',
@@ -31,6 +31,5 @@ setup(
         'numba',
         'vispy',
         'PyOpenGL',
-        'PyOpenGL_accelerate'
     ]
 )

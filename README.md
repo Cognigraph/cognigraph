@@ -6,7 +6,7 @@ Inverse-modelling-related capabilities of cognigraph
 Самый простой вариант - через среду conda. 
 
 ```bash
-conda create -n cognigraph python=3 pyqt=5 pyqtgraph ipython scipy numba sympy sklearn pandas matplotlib numba
+conda create -n cognigraph python=3.6 pyqt=5 pyqtgraph ipython scipy numba sympy scikit-learn pandas matplotlib numba
 activate cognigraph
 pip install pylsl expyriment mne
 ```
@@ -21,7 +21,7 @@ pip install pylsl expyriment mne
 Далее необходимо перейти в папку репозитория и установить пакет:
 
 ```bash
-git clone --recursive git@github.com:dmalt/cognigraph.git
+git clone --recursive https://github.com/Cognigraph/cognigraph.git
 cd cognigraph
 pip install --editable .
 ```
@@ -42,5 +42,12 @@ pip install --editable .
     ```
     Папку _MNE-sample-data_ из архива копируем в выведенный путь.
 
+**Опциональные пакеты**
+1. PyOpenGL_accelerate -- крайне рекомендуется, но будет работать и без него
+    ```bash
+    pip install PyOpenGL_accelerate
+    ```
+2. pytorch -- необходим только для работы узла TorchOutput
 
-
+    Необходимо перейти по [ссылке](https://pytorch.org/#pip-install-pytorch)
+    и установить в соответствии с инструкциями
