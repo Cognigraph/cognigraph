@@ -11,6 +11,21 @@ string2fmt['float64'] = string2fmt['double64']
 LSL_TIME_DIMENSION_ID = 0
 
 
+class FixedStreamInfo(lsl.StreamInfo):
+    def as_xml(self):
+        return lsl.pylsl.lib.lsl_get_xml(self.obj).decode('utf-8', 'ignore')
+
+
+class FixedStreamInlet(lsl.StreamInlet):
+    def info(self, timeout=lsl.pylsl.FOREVER):
+        errcode = lsl.pylsl.c_int()
+        result = lsl.pylsl.lib.lsl_get_fullinfo(self.obj,
+                                                lsl.pylsl.c_double(timeout),
+                                                lsl.pylsl.byref(errcode))
+        lsl.pylsl.handle_error(errcode)
+        return FixedStreamInfo(handle=result) # StreamInfo(handle=result)
+
+
 def convert_lsl_format_to_numpy(lsl_channel_format: int):
     return fmt2string[lsl_channel_format]
 
@@ -19,12 +34,15 @@ def convert_numpy_format_to_lsl(numpy_channel_format: np.dtype):
     return string2fmt[str(numpy_channel_format)]
 
 
-def create_lsl_outlet(name, frequency, channel_format, channel_labels, channel_types, type=''):
+def create_lsl_outlet(name, frequency, channel_format,
+                      channel_labels, channel_types, type=''):
     # Create StreamInfo
     channel_count = len(channel_labels)
     source_id = str(uuid.uuid4())
-    info = lsl.StreamInfo(name=name, type=type, channel_count=channel_count, nominal_srate=frequency,
-                          channel_format=channel_format, source_id=source_id)
+    info = FixedStreamInfo(
+        name=name, type=type, channel_count=channel_count,
+        nominal_srate=frequency, channel_format=channel_format,
+        source_id=source_id)
 
     # Add channel labels
     desc = info.desc()

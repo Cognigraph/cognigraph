@@ -10,25 +10,13 @@ from .. import TIME_AXIS, DTYPE
 from .node import SourceNode
 from ..helpers.lsl import (convert_lsl_chunk_to_numpy_array,
                            convert_lsl_format_to_numpy,
-                           read_channel_labels_from_info)
+                           read_channel_labels_from_info,
+                           FixedStreamInfo, FixedStreamInlet)
 from ..helpers.brainvision import (read_brain_vision_data,
                                    read_fif_data,
                                    read_edf_data)
 
 
-class FixedStreamInfo(lsl.StreamInfo):
-    def as_xml(self):
-        return lsl.pylsl.lib.lsl_get_xml(self.obj).decode('utf-8', 'ignore')
-
-
-class FixedStreamInlet(lsl.StreamInlet):
-    def info(self, timeout=lsl.pylsl.FOREVER):
-        errcode = lsl.pylsl.c_int()
-        result = lsl.pylsl.lib.lsl_get_fullinfo(self.obj,
-                                                lsl.pylsl.c_double(timeout),
-                                                lsl.pylsl.byref(errcode))
-        lsl.pylsl.handle_error(errcode)
-        return FixedStreamInfo(handle=result) # StreamInfo(handle=result)
 
 class LSLStreamSource(SourceNode):
     """ Class for reading data from an LSL stream defined by its name """
