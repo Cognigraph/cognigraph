@@ -100,10 +100,11 @@ def assemble_pipeline(file_path, inverse_method='mne'):
     # )
     # pipeline.add_processor(aec)
     # aec.input_node = inverse_model
-    coh = processors.Coherence(
-        method='coh', seed=None)
-    coh.input_node = roi_average
-    pipeline.add_processor(coh)
+
+    # coh = processors.Coherence(method='coh', seed=None)
+    # coh.input_node = roi_average
+    # pipeline.add_processor(coh)
+
     # aec_env = processors.EnvelopeExtractor(0.995)
     # pipeline.add_processor(aec_env)
 
@@ -118,9 +119,9 @@ def assemble_pipeline(file_path, inverse_method='mne'):
     # signal_viewer_src = outputs.SignalViewer()
     # pipeline.add_output(signal_viewer, input_node=linear_filter)
     # pipeline.add_output(signal_viewer_src, input_node=roi_average)
-    con_viewer = outputs.ConnectivityViewer(
-        surfaces_dir=op.join(SURF_DIR, SUBJECT))
-    pipeline.add_output(con_viewer, input_node=coh)
+
+    # con_viewer = outputs.ConnectivityViewer(surfaces_dir=op.join(SURF_DIR, SUBJECT))
+    # pipeline.add_output(con_viewer, input_node=coh)
     # --------------------------------------------------------------------- #
     return pipeline
 

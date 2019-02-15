@@ -3,6 +3,10 @@ from PyQt5 import QtCore, QtWidgets
 from ..pipeline import Pipeline
 from .controls import Controls
 from .screen_recorder import ScreenRecorder
+from portal.portal_server import PortalServer
+
+import threading
+import time
 
 import logging
 logger = logging.getLogger(name=__name__)
@@ -24,10 +28,18 @@ class GUIWindow(QtWidgets.QMainWindow):
         self.gif_button = QtWidgets.QPushButton("Record gif")
         self.gif_button.clicked.connect(self._toggle_gif_button)
 
+        # Portal button
+        self.portal_button = QtWidgets.QPushButton('Activate Portal')
+        self.portal_button.clicked.connect(self._toggle_portal_button)
+
         # Resize screen
         self.resize(QtCore.QSize(
             QtWidgets.QDesktopWidget().availableGeometry().width() * 0.9,
             QtWidgets.QDesktopWidget().availableGeometry().height() * 0.9))
+
+        # Portal server
+        self.portal_server = PortalServer(('localhost', 8007))
+        self.portal_server.start()
 
     def init_ui(self):
         self._controls.initialize()
@@ -43,7 +55,11 @@ class GUIWindow(QtWidgets.QMainWindow):
         buttons_layout.addWidget(self.run_button)
         buttons_layout.addWidget(self.gif_button)
 
+        portal_layout = QtWidgets.QHBoxLayout()
+        portal_layout.addWidget(self.portal_button)
+
         controls_layout.addLayout(buttons_layout)
+        controls_layout.addLayout(portal_layout)
 
         self._controls_widget.setMinimumWidth(400)
 
@@ -96,6 +112,36 @@ class GUIWindow(QtWidgets.QMainWindow):
             self._reset_gif_sector()
             self.gif_button.setText("Stop recording")
             self._gif_recorder.start()
+
+    def closeEvent(self, event):
+        self.portal_server.stop()
+        print(threading.enumerate())
+        print([x.getName() for x in threading.enumerate()])
+        for thread in threading.enumerate():
+            if thread.isAlive():
+                thread._Thread_stop()
+        event.accept()
+
+    def _toggle_portal_button(self):
+        if self.portal_button.text() == 'Activate Portal':
+            t = threading.Thread(target=self._portal_activation, args=())
+            t.start()
+        else:
+            self.portal_button.setText('Activate Portal')
+            self.portal_server.close_connection()
+
+    def _portal_activation(self):
+        self.portal_button.setEnabled(False)
+        self.portal_server.listen_connection()
+        counter = 0
+        while self.portal_server.connection is None:
+            time.sleep(1)
+            counter += 1
+            if counter == 10:
+                counter = 0
+                print('No Portal..')
+        self.portal_button.setText('Deactivate Portal')
+        self.portal_button.setEnabled(True)
 
     @property
     def _node_widgets(self) -> List[QtWidgets.QWidget]:
