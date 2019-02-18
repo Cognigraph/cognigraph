@@ -91,6 +91,10 @@ def assemble_pipeline(file_path, inverse_method='mne'):
     roi_average.input_node = inverse_model
     pipeline.add_processor(roi_average)
 
+    lsl_output = outputs.LSLStreamOutput("to_portal")
+    pipeline.add_output(lsl_output)
+    lsl_output.input_node = preprocessing
+
     # aec = processors.AmplitudeEnvelopeCorrelations(
     #     # method=None,
     #     # seed=1000
@@ -232,7 +236,7 @@ if __name__ == '__main__':
     window = GUIWindow(pipeline=pipeline)
     window.init_ui()
     window.initialize()  # initializes all pipeline nodes
-    window.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+    # window.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
 
     thread = AsyncUpdater()
     window.run_button.clicked.connect(thread.toggle)

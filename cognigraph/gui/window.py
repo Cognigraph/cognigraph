@@ -31,6 +31,10 @@ class GUIWindow(QtWidgets.QMainWindow):
         # Portal button
         self.portal_button = QtWidgets.QPushButton('Activate Portal')
         self.portal_button.clicked.connect(self._toggle_portal_button)
+        self.portal_run_button = QtWidgets.QPushButton('Run Portal')
+        self.portal_run_button.clicked.connect(self._toggle_run_portal_button)
+        self.portal_run_button.setEnabled(False)
+        self.portal_subject = None
 
         # Resize screen
         self.resize(QtCore.QSize(
@@ -40,6 +44,7 @@ class GUIWindow(QtWidgets.QMainWindow):
         # Portal server
         self.portal_server = PortalServer(('localhost', 8007))
         self.portal_server.start()
+        self._FINISH_THREADS = False
 
     def init_ui(self):
         self._controls.initialize()
@@ -57,6 +62,7 @@ class GUIWindow(QtWidgets.QMainWindow):
 
         portal_layout = QtWidgets.QHBoxLayout()
         portal_layout.addWidget(self.portal_button)
+        portal_layout.addWidget(self.portal_run_button)
 
         controls_layout.addLayout(buttons_layout)
         controls_layout.addLayout(portal_layout)
@@ -115,11 +121,9 @@ class GUIWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         self.portal_server.stop()
-        print(threading.enumerate())
-        print([x.getName() for x in threading.enumerate()])
-        for thread in threading.enumerate():
-            if thread.isAlive():
-                thread._Thread_stop()
+        self._FINISH_THREADS = True
+        time.sleep(1)
+        # print([x.getName() for x in threading.enumerate()])
         event.accept()
 
     def _toggle_portal_button(self):
@@ -129,19 +133,90 @@ class GUIWindow(QtWidgets.QMainWindow):
         else:
             self.portal_button.setText('Activate Portal')
             self.portal_server.close_connection()
+            self.portal_run_button.setEnabled(False)
+
+    def _toggle_run_portal_button(self):
+        data = self.portal_server.get_splitted_data()
+        self._show_portal_dialog(data)
+        if self.portal_subject is not None:
+            self.portal_server.send_message(self.portal_subject)
 
     def _portal_activation(self):
         self.portal_button.setEnabled(False)
         self.portal_server.listen_connection()
         counter = 0
-        while self.portal_server.connection is None:
+        while self.portal_server.is_listening:
             time.sleep(1)
             counter += 1
             if counter == 10:
                 counter = 0
                 print('No Portal..')
-        self.portal_button.setText('Deactivate Portal')
-        self.portal_button.setEnabled(True)
+            if self._FINISH_THREADS:
+                break
+
+        if self.portal_server.connection is not None:
+            self.portal_button.setText('Deactivate Portal')
+            self.portal_server.receive_message()
+            self.portal_button.setEnabled(True)
+            counter = 0
+            while self.portal_server.received_data is None:
+                time.sleep(1)
+                counter += 1
+                if counter == 10:
+                    counter = 0
+                    print('No Data..')
+                if self._FINISH_THREADS:
+                    break
+            self.portal_run_button.setEnabled(True)
+        else:
+            self.portal_button.setEnabled(True)
+
+    def _show_portal_dialog(self, data):
+        def select_clicked():
+            items = listbox.selectedItems()
+            if len(items) > 0:
+                self.portal_subject = '0|' + combobox.currentText() + '/' + items[0].text()
+                dialog.close()
+
+        def new_clicked():
+            self.portal_subject = '1|' + combobox.currentText()
+            dialog.close()
+
+        def combobox_changed():
+            index = combobox.currentIndex()
+            listbox.clear()
+            if len(data[index]) > 2:
+                listbox.addItems(data[index][2:])
+            newmodel_button.setEnabled(int(data[index][1]))
+
+        dialog = QtWidgets.QDialog()
+        dialog.setWindowTitle('Portal')
+        dialog.setFixedSize(200, 270)
+
+        select_button = QtWidgets.QPushButton('Select', dialog)
+        select_button.move(10, 240)
+        select_button.setFixedWidth(54)
+        select_button.clicked.connect(select_clicked)
+
+        newmodel_button = QtWidgets.QPushButton('New', dialog)
+        newmodel_button.move(73, 240)
+        newmodel_button.setFixedWidth(54)
+        newmodel_button.clicked.connect(new_clicked)
+
+        cancel_button = QtWidgets.QPushButton('Cancel', dialog)
+        cancel_button.move(136, 240)
+        cancel_button.setFixedWidth(54)
+        cancel_button.clicked.connect(dialog.close)
+
+        combobox = QtWidgets.QComboBox(dialog)
+        combobox.setGeometry(10, 10, 180, 20)
+        combobox.addItems([x[0] for x in data])
+        combobox.currentIndexChanged.connect(combobox_changed)
+
+        listbox = QtWidgets.QListWidget(dialog)
+        combobox_changed()
+        listbox.setGeometry(10, 40, 180, 190)
+        dialog.exec_()
 
     @property
     def _node_widgets(self) -> List[QtWidgets.QWidget]:
