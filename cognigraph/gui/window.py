@@ -43,7 +43,6 @@ class GUIWindow(QtWidgets.QMainWindow):
 
         # Portal server
         self.portal_server = PortalServer(('localhost', 8007))
-        self.portal_server.start()
         self._FINISH_THREADS = False
 
     def init_ui(self):
@@ -128,6 +127,8 @@ class GUIWindow(QtWidgets.QMainWindow):
 
     def _toggle_portal_button(self):
         if self.portal_button.text() == 'Activate Portal':
+            if not self.portal_server.isAlive():
+                self.portal_server.start()
             t = threading.Thread(target=self._portal_activation, args=())
             t.start()
         else:
@@ -140,6 +141,7 @@ class GUIWindow(QtWidgets.QMainWindow):
         self._show_portal_dialog(data)
         if self.portal_subject is not None:
             self.portal_server.send_message(self.portal_subject)
+            self.portal_server.stop()
 
     def _portal_activation(self):
         self.portal_button.setEnabled(False)
