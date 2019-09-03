@@ -38,8 +38,11 @@ node_controls_map = namedtuple(
 
 
 class _PipelineTreeWidgetItem(QTreeWidgetItem):
-    def __init__(self, parent_item, node, widget):
-        QTreeWidgetItem.__init__(self, parent_item, [repr(node)])
+    def __init__(self, parent_item, node, widget, node_name=None):
+        if node_name is None:
+            QTreeWidgetItem.__init__(self, parent_item, [repr(node)])
+        else:
+            QTreeWidgetItem.__init__(self, parent_item, [node_name])
         self.node = node
         self.widget = widget
 
@@ -221,17 +224,39 @@ class BaseControls(QWidget):
 
 
 class _CreateNodeDialog(QDialog):
-    def __init__(self, node_cls, parent=None):
+    def __init__(self, node_cls, parent=None, app=None):
         QDialog.__init__(self, parent)
 
         self.widget = ParameterTree(showHeader=False)
+        self.setWindowTitle('Cognigraph')
         layout = QVBoxLayout()
         layout.addWidget(self.widget)
         params = parameterTypes.GroupParameter(name="Parameters setup")
+
         self.node = node_cls()
         controls_cls = node_to_controls_map[node_cls.__name__]
         self.controls = controls_cls(self.node)
+
         params.addChild(self.controls)
+
+        def translate(obj):
+            obj.opts['name'] = app.translate("Parameters", obj.opts['name'])
+            if obj.opts['title'] is not None:
+                obj.opts['title'] = app.translate("Parameters", obj.opts['title'])
+            # Code for listbox parameters translation
+            # if obj.opts['values'] is not None:
+            #     obj.opts['values'] = tuple([app.translate("Parameters", v) for v in obj.opts['values']])
+            #     obj.opts['value'] = app.translate("Parameters", obj.opts['value'])
+            #     obj.opts['limits'] = tuple([app.translate("Parameters", v) for v in obj.opts['limits']])
+            #     obj.opts['default'] = app.translate("Parameters", obj.opts['default'])
+            if len(obj.childs) > 0:
+                for i in range(len(obj.childs)):
+                    obj.childs[i] = translate(obj.childs[i])
+            return obj
+
+        if app is not None:
+            params = translate(params)
+
         self.widget.setParameters(params)
         dialog_buttons = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -258,9 +283,10 @@ class PipelineTreeWidget(QTreeWidget):
     node_added = pyqtSignal("PyQt_PyObject", "PyQt_PyObject")
     node_removed = pyqtSignal("PyQt_PyObject")
 
-    def __init__(self, pipeline: Pipeline):
+    def __init__(self, pipeline: Pipeline, app=None):
         super().__init__()
         self.clear()
+        self._app = app
         self.setColumnCount(1)
         self.setHeaderHidden(True)
         self.setItemsExpandable(True)
@@ -286,11 +312,11 @@ class PipelineTreeWidget(QTreeWidget):
         actions = []
         if len(allowed_children) > 0:
             submenu = QMenu(menu)
-            submenu.setTitle("Add node")
+            submenu.setTitle(self._app.translate("Pipeline", "Add node"))
             menu.addMenu(submenu)
             for c in allowed_children:
                 child_cls = getattr(nodes, c)
-                add_node_action = QAction(repr(child_cls), submenu)
+                add_node_action = QAction(self._app.translate("Pipeline", repr(child_cls)), submenu)
                 add_node_action.triggered.connect(
                     partial(
                         self._on_add_node_action,
@@ -302,7 +328,7 @@ class PipelineTreeWidget(QTreeWidget):
                 actions.append(add_node_action)
             submenu.addActions(actions)
         if len(item.node._children) == 0:
-            remove_node_action = QAction("Remove node", menu)
+            remove_node_action = QAction(self._app.translate("Pipeline", "Remove node"), menu)
             menu.addAction(remove_node_action)
             remove_node_action.triggered.connect(
                 partial(self._on_remove_node_action, item)
@@ -334,7 +360,8 @@ class PipelineTreeWidget(QTreeWidget):
 
         """
         self._logger.debug("Adding %s to %s" % (child_cls, parent))
-        self.create_node_dialog = _CreateNodeDialog(child_cls, parent=self)
+        # child_cls.CHANGES_IN_THESE_REQUIRE_RESET = tuple([self._app.translate("Parameters", x) for x in child_cls.CHANGES_IN_THESE_REQUIRE_RESET])
+        self.create_node_dialog = _CreateNodeDialog(child_cls, parent=self, app=self._app)
         self.create_node_dialog.show()
         self.create_node_dialog.widget.setSizeAdjustPolicy(1)
         self.create_node_dialog.widget.setSizePolicy(
@@ -386,11 +413,12 @@ class PipelineTreeWidget(QTreeWidget):
 
 
 class Controls(QWidget):
-    def __init__(self, pipeline: Pipeline, parent=None):
+    def __init__(self, pipeline: Pipeline, parent=None, app=None):
         QWidget.__init__(self, parent)
         self._pipeline = pipeline  # type: Pipeline
+        self._app = app
 
-        self.tree_widget = PipelineTreeWidget(pipeline=self._pipeline)
+        self.tree_widget = PipelineTreeWidget(pipeline=self._pipeline, app=app)
         layout = QVBoxLayout()
         layout.addWidget(self.tree_widget)
 
@@ -405,7 +433,7 @@ class Controls(QWidget):
     def _add_nodes(self, node, parent_item):
         widget = self._create_node_controls_widget(node)
         widget.hide()
-        this_item = _PipelineTreeWidgetItem(parent_item, node, widget)
+        this_item = _PipelineTreeWidgetItem(parent_item, node, widget, node_name=self._app.translate("Pipeline", repr(node)))
         if parent_item is self.tree_widget:
             self.tree_widget.setCurrentItem(this_item)
             widget.show()
@@ -420,11 +448,33 @@ class Controls(QWidget):
         controls = controls_cls(node)
         params = parameterTypes.GroupParameter(name=repr(node))
         params.addChild(controls)
+
+        def translate(obj):
+            obj.opts['name'] = self._app.translate("Parameters", obj.opts['name'])
+            if obj.opts['title'] is not None:
+                obj.opts['title'] = self._app.translate("Parameters", obj.opts['title'])
+            if len(obj.childs) > 0:
+                for i in range(len(obj.childs)):
+                    obj.childs[i] = translate(obj.childs[i])
+            return obj
+
+        if self._app is not None:
+            params = translate(params)
+
         widget = ParameterTree(showHeader=False)
         widget.setParameters(params)
         widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         widget.setSizeAdjustPolicy(1)
         return widget
+
+    def translate_tree(self, obj=None):
+        if obj is None:
+            self.translate_tree(obj=self.tree_widget.topLevelItem(0))
+        else:
+            obj.setText(0, self._app.translate("Pipeline", obj.text(0)))
+            for i in range(obj.childCount()):
+                self.translate_tree(obj=obj.child(i))
+
 
 
 if __name__ == "__main__":

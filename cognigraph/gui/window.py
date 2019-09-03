@@ -1,6 +1,6 @@
 from typing import List
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTranslator, QEvent
 from PyQt5.Qt import QSizePolicy
 from PyQt5.QtWidgets import (
     QDockWidget,
@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QProgressDialog,
     QFileDialog,
     QMessageBox,
+    QMenu,
 )
 from ..nodes.pipeline import Pipeline
 from .async_pipeline_update import AsyncPipelineInitializer, AsyncUpdater
@@ -46,11 +47,173 @@ class GUIWindow(QMainWindow):
         self._app = app
         self._logger = logging.getLogger(self.__class__.__name__)
         self._is_initialized = False
+        self.translator = QTranslator()
+        self.language = 'eng'
+        self.init_translator()
         self.init_basic(pipeline)
         self.init_ui()
         self.init_controls()
         self.setWindowTitle("Cognigraph")
         self.setWindowIcon(QIcon(':/cognigraph_icon.png'))
+
+    def init_translator(self):
+        print('Loading translation file:', self.translator.load('../translate/tr_eng.qm'))
+        self._app.installTranslator(self.translator)
+        # self._app.translate("QDockWidget", "Processing pipeline setup")
+        # self._app.translate("QDockWidget", "Настройка конвейера")
+        # self._app.translate("QMenu", "File")
+        # self._app.translate("QMenu", "Файл")
+        # self._app.translate("QMenu", "Load pipeline")
+        # self._app.translate("QMenu", "Загрузить конвейер")
+        # self._app.translate("QMenu", "Save pipeline")
+        # self._app.translate("QMenu", "Сохранить конвейер")
+        # self._app.translate("QMenu", "Language")
+        # self._app.translate("QMenu", "Язык")
+        # self._app.translate("QMenu", "English")
+        # self._app.translate("QMenu", "Английский")
+        # self._app.translate("QMenu", "Russian")
+        # self._app.translate("QMenu", "Русский")
+        # self._app.translate("QMenu", "Tile windows")
+        # self._app.translate("QMenu", "Закрепить окна")
+        # self._app.translate("QMenu", "View")
+        # self._app.translate("QMenu", "Просмотр")
+        # self._app.translate("QMenu", "Edit")
+        # self._app.translate("QMenu", "Редактирование")
+        # self._app.translate("QMenu", "Hide pipeline settings")
+        # self._app.translate("QMenu", "Скрыть настройки конвейера")
+        # self._app.translate("QMenu", "Show pipeline settings")
+        # self._app.translate("QMenu", "Показать настройки конвейера")
+        # self._app.translate("QMenu", "Start")
+        # self._app.translate("QMenu", "Старт")
+        # self._app.translate("QMenu", "Run")
+        # self._app.translate("QMenu", "Запуск")
+        # self._app.translate("QMenu", "Initialize pipeline")
+        # self._app.translate("QMenu", "Инициализировать конвейер")
+        # self._app.translate("Pipeline", "Pipeline")
+        # self._app.translate("Pipeline", "Конвейер обработки")
+        # self._app.translate("Pipeline", "File Source Node")
+        # self._app.translate("Pipeline", "File Source")
+        # self._app.translate("Pipeline", "Входной файл")
+        # self._app.translate("Pipeline", "Preprocessing Node")
+        # self._app.translate("Pipeline", "Preprocessing")
+        # self._app.translate("Pipeline", "Предобработка")
+        # self._app.translate("Pipeline", "Linear Filter Node")
+        # self._app.translate("Pipeline", "Linear Filter")
+        # self._app.translate("Pipeline", "Линейная фильтрация")
+        # self._app.translate("Pipeline", "Beamformer Node")
+        # self._app.translate("Pipeline", "Beamformer")
+        # self._app.translate("Pipeline", "Бимформер")
+        # self._app.translate("Pipeline", "Envelope Extractor Node")
+        # self._app.translate("Pipeline", "Envelope Extractor")
+        # self._app.translate("Pipeline", "Огибающая")
+        # self._app.translate("Pipeline", "Brain Viewer Node")
+        # self._app.translate("Pipeline", "Brain Viewer")
+        # self._app.translate("Pipeline", "Отображение мозга")
+        # self._app.translate("Pipeline", "LSL stream")
+        # self._app.translate("Pipeline", "Входной LSL поток")
+        # self._app.translate("Pipeline", "ICA Rejection")
+        # self._app.translate("Pipeline", "Удаление артефактов (ICA)")
+        # self._app.translate("Pipeline", "MNE")
+        # self._app.translate("Pipeline", "MCE")
+        # self._app.translate("Pipeline", "LSL Stream Output")
+        # self._app.translate("Pipeline", "Выходной LSL поток")
+        # self._app.translate("Pipeline", "File Output")
+        # self._app.translate("Pipeline", "Выходной файл")
+        # self._app.translate("Pipeline", "Signal Viewer")
+        # self._app.translate("Pipeline", "Отображение сигналов")
+        # self._app.translate("Pipeline", "Coherence")
+        # self._app.translate("Pipeline", "Когерентности")
+        # self._app.translate("Pipeline", "Atlas Viewer")
+        # self._app.translate("Pipeline", "Отображение атласа")
+        # self._app.translate("Pipeline", "Seed Coherence")
+        # self._app.translate("Pipeline", "Когерентности с источником")
+        # self._app.translate("Pipeline", "LSL stream Node")
+        # self._app.translate("Pipeline", "ICA Rejection Node")
+        # self._app.translate("Pipeline", "MNE Node")
+        # self._app.translate("Pipeline", "MCE Node")
+        # self._app.translate("Pipeline", "LSL Stream Output Node")
+        # self._app.translate("Pipeline", "Signal Viewer Node")
+        # self._app.translate("Pipeline", "File Output Node")
+        # self._app.translate("Pipeline", "Atlas Viewer Node")
+        # self._app.translate("Pipeline", "Seed Coherence Node")
+        # self._app.translate("Pipeline", "Coherence Node")
+        # self._app.translate("Parameters", "Factor: ")
+        # self._app.translate("Parameters", "Method: ")
+        # self._app.translate("Parameters", "Disable: ")
+        # self._app.translate("Parameters", "Source type: ")
+        # self._app.translate("Parameters", "Choose a stream: ")
+        # self._app.translate("Parameters", "Path to file: ")
+        # self._app.translate("Parameters", "Parameters setup")
+        # self._app.translate("Parameters", "LSL stream Node")
+        # self._app.translate("Parameters", "File Source Node")
+        # self._app.translate("Parameters", "source controls")
+        # self._app.translate("Parameters", "Select data...")
+        # self._app.translate("Parameters", "Preprocessing")
+        # self._app.translate("Parameters", "Baseline duration: ")
+        # self._app.translate("Parameters", "Downsample factor: ")
+        # self._app.translate("Parameters", "Find bad channels")
+        # self._app.translate("Parameters", "Bad channels")
+        # self._app.translate("Parameters", "Reset bad channels")
+        # self._app.translate("Parameters", "Linear filter")
+        # self._app.translate("Parameters", "Lower cutoff: ")
+        # self._app.translate("Parameters", "Upper cutoff: ")
+        # self._app.translate("Parameters", "ICA rejection")
+        # self._app.translate("Parameters", "ICA duration: ")
+        # self._app.translate("Parameters", "Collect data")
+        # self._app.translate("Parameters", "Reset ICA decomposition")
+        # self._app.translate("Parameters", "Select ICA components")
+        # self._app.translate("Parameters", "Inverse modelling")
+        # self._app.translate("Parameters", "SNR: ")
+        # self._app.translate("Parameters", "Setup forward model")
+        # self._app.translate("Parameters", "MCE Inverse modelling")
+        # self._app.translate("Parameters", "Number of PCA components: ")
+        # self._app.translate("Parameters", "Beamformer")
+        # self._app.translate("Parameters", "Use adaptive version: ")
+        # self._app.translate("Parameters", "Prewhiten: ")
+        # self._app.translate("Parameters", "Regularization: ")
+        # self._app.translate("Parameters", "Output type: ")
+        # self._app.translate("Parameters", "Forgetting factor (per second): ")
+        # self._app.translate("Parameters", "LSL stream")
+        # self._app.translate("Parameters", "Output stream name: ")
+        # self._app.translate("Parameters", "File Output")
+        # self._app.translate("Parameters", "Output path: ")
+        # self._app.translate("Parameters", "Change output file")
+        # self._app.translate("Parameters", "Start")
+        # self._app.translate("Parameters", "Signal Viewer")
+        # self._app.translate("Parameters", "Coherence controls")
+        # self._app.translate("Parameters", "Extract envelope: ")
+        # self._app.translate("Parameters", "3D visualization settings")
+        # self._app.translate("Parameters", "Show absolute values: ")
+        # self._app.translate("Parameters", "Limits: ")
+        # self._app.translate("Parameters", "Lock current limits: ")
+        # self._app.translate("Parameters", "Buffer length: ")
+        # self._app.translate("Parameters", "Lower limit: ")
+        # self._app.translate("Parameters", "Upper limit: ")
+        # self._app.translate("Parameters", "Show activations exceeding ")
+        # self._app.translate("Parameters", "Record gif")
+        # self._app.translate("Parameters", "Refresh rate, FPS")
+        # self._app.translate("Parameters", "Atlas Viewer")
+        # self._app.translate("Parameters", "Select ROI")
+        # self._app.translate("Parameters", "Seed Coherence controls")
+        # self._app.translate("Parameters", "Select seed")
+        # self._app.translate("Parameters", "Forward solution file")
+        # self._app.translate("Parameters", "Input file")
+        # self._app.translate("Parameters", "Pipeline")
+        # self._app.translate("Parameters", "Pipeline settings")
+        # self._app.translate("Parameters", "Preprocessing Node")
+        # self._app.translate("Parameters", "Linear Filter Node")
+        # self._app.translate("Parameters", "Beamformer Node")
+        # self._app.translate("Parameters", "Envelope Extractor Node")
+        # self._app.translate("Parameters", "Brain Viewer Node")
+        # self._app.translate("Parameters", "ICA Rejection Node")
+        # self._app.translate("Parameters", "MNE Node")
+        # self._app.translate("Parameters", "MCE Node")
+        # self._app.translate("Parameters", "Signal Viewer Node")
+        # self._app.translate("Parameters", "LSL Stream Output Node")
+        # self._app.translate("Parameters", "File Output Node")
+        # self._app.translate("Parameters", "Atlas Viewer Node")
+        # self._app.translate("Parameters", "Seed Coherence Node")
+        # self._app.translate("Parameters", "Coherence Node")
 
     def init_basic(self, pipeline):
         self._pipeline = pipeline  # type: Pipeline
@@ -67,7 +230,7 @@ class GUIWindow(QMainWindow):
         self._pipeline._signal_sender.node_widget_added.connect(
             self._on_node_widget_added
         )
-        self._controls = Controls(pipeline=self._pipeline)
+        self._controls = Controls(pipeline=self._pipeline, app=self._app)
         self._controls.setSizePolicy(
             QSizePolicy.Preferred, QSizePolicy.Expanding
         )
@@ -104,43 +267,37 @@ class GUIWindow(QMainWindow):
         # self._controls.setMinimumWidth(800)
         # --------------------------------- #
 
-        file_menu = self.menuBar().addMenu("&File")  # file menu
-        load_pipeline_action = self._createAction(
-            "&Load pipeline", self._load_pipeline
-        )
-        save_pipeline_action = self._createAction(
-            "&Save pipeline", self._save_pipeline
-        )
+        file_menu = self.menuBar().addMenu("File")  # file menu
+        load_pipeline_action = self._createAction("Load pipeline", self._load_pipeline)
+        save_pipeline_action = self._createAction("Save pipeline", self._save_pipeline)
         file_menu.addAction(load_pipeline_action)
         file_menu.addAction(save_pipeline_action)
 
+        language_menu = self.menuBar().addMenu("Language")
+        set_english_action = self._createAction("English", self._set_english)
+        set_russian_action = self._createAction("Русский", self._set_russian)
+        language_menu.addAction(set_english_action)
+        language_menu.addAction(set_russian_action)
+
         # -------- view menu & toolbar -------- #
-        tile_windows_action = self._createAction(
-            "&Tile windows", self.central_widget.tileSubWindows
-        )
-        view_menu = self.menuBar().addMenu("&View")
+        tile_windows_action = self._createAction("Tile windows", self.central_widget.tileSubWindows)
+        view_menu = self.menuBar().addMenu("View")
         view_menu.addAction(tile_windows_action)
         view_toolbar = self.addToolBar("View")
         view_toolbar.addAction(tile_windows_action)
         # ------------------------------------- #
 
-        edit_menu = self.menuBar().addMenu("&Edit")
-        self._toggle_pipeline_tree_widget_action = self._createAction(
-            "&Hide pipeline settings", self._toggle_pipeline_tree_widget
-        )
+        edit_menu = self.menuBar().addMenu("Edit")
+        self._toggle_pipeline_tree_widget_action = self._createAction("Hide pipeline settings", self._toggle_pipeline_tree_widget)
         edit_menu.addAction(self._toggle_pipeline_tree_widget_action)
         edit_toolbar = self.addToolBar("Edit")
         edit_toolbar.setObjectName("edit_toolbar")
         edit_toolbar.addAction(self._toggle_pipeline_tree_widget_action)
 
         # -------- run menu & toolbar -------- #
-        self.run_toggle_action = self._createAction(
-            "&Start", self._on_run_button_toggled
-        )
-        run_menu = self.menuBar().addMenu("&Run")
-        self.initialize_pipeline = self._createAction(
-            "&Initialize pipeline", self.initialize
-        )
+        self.run_toggle_action = self._createAction("Start", self._on_run_button_toggled)
+        run_menu = self.menuBar().addMenu("Run")
+        self.initialize_pipeline = self._createAction("Initialize pipeline", self.initialize)
         run_menu.addAction(self.run_toggle_action)
         run_menu.addAction(self.initialize_pipeline)
         run_toolbar = self.addToolBar("Run")
@@ -157,13 +314,17 @@ class GUIWindow(QMainWindow):
 
     def _update_pipeline_tree_widget_action_text(self, is_visible):
         if is_visible:
-            self._toggle_pipeline_tree_widget_action.setText(
-                "&Hide pipelne settings"
-            )
+            self._toggle_pipeline_tree_widget_action.setText(self._app.translate("QMenu", "Hide pipeline settings"))
         else:
-            self._toggle_pipeline_tree_widget_action.setText(
-                "&Show pipelne settings"
-            )
+            self._toggle_pipeline_tree_widget_action.setText(self._app.translate("QMenu", "Show pipeline settings"))
+
+    def _reinitialize_pipeline(self):
+        params = self._pipeline._save_dict()
+        # selected_item = self._controls.tree_widget.selectedIndexes()[0]
+        pipeline = self.assemble_pipeline(params, "Pipeline")
+        self.init_basic(pipeline)
+        self.init_controls()
+        # self._controls.tree_widget.setCurrentIndex(selected_item)
 
     def _load_pipeline(self):
         file_dialog = QFileDialog(
@@ -211,6 +372,36 @@ class GUIWindow(QMainWindow):
                     detailed_text=str(exc),
                 )
                 self._logger.exception(exc)
+
+    def _set_english(self):
+        if self.language == 'eng':
+            return
+        self.language = 'eng'
+        self._app.removeTranslator(self.translator)
+        print('Loading translation file:', self.translator.load('../translate/tr_eng.qm'))
+        self._app.installTranslator(self.translator)
+
+    def _set_russian(self):
+        if self.language == 'ru':
+            return
+        self.language = 'ru'
+        self._app.removeTranslator(self.translator)
+        print('Loading translation file:', self.translator.load('../translate/tr_ru.qm'))
+        self._app.installTranslator(self.translator)
+
+    def translateUI(self):
+        self.controls_dock.setWindowTitle(self._app.translate("QDockWidget", "Processing pipeline setup"))
+        for child in self.menuBar().children():
+            if isinstance(child, QMenu):
+                child.setTitle(self._app.translate("QMenu", child.title()))
+                for act in child.actions():
+                    act.setText(self._app.translate("QMenu", act.text()))
+        self._controls.translate_tree()
+        self._reinitialize_pipeline()
+
+    def changeEvent(self, event: QEvent):
+        if (event.type() == QEvent.LanguageChange):
+            self.translateUI()
 
     def assemble_pipeline(self, d, class_name):
         node_class = getattr(nodes, class_name)

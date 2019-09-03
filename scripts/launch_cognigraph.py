@@ -129,3 +129,7 @@ def main():
     pipeline._children[0].loop_the_file = True
     app.aboutToQuit.connect(on_main_window_close)
     app.exec_()
+
+
+if __name__ == '__main__':
+    main()
