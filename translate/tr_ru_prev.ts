@@ -259,8 +259,8 @@
     </message>
     <message>
         <location filename="../cognigraph/gui/window.py" line="181"/>
-        <source>Верхний порог: </source>
-        <translation type="unfinished"></translation>
+        <source>Upper limit: </source>
+        <translation>Верхний порог: </translation>
     </message>
     <message>
         <location filename="../cognigraph/gui/window.py" line="182"/>
@@ -306,6 +306,86 @@
         <location filename="../cognigraph/gui/window.py" line="190"/>
         <source>Input file</source>
         <translation>Входной файл</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="201"/>
+        <source>Pipeline</source>
+        <translation>Конвейер</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="202"/>
+        <source>Pipeline settings</source>
+        <translation>Настройки конвейера</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="203"/>
+        <source>Preprocessing Node</source>
+        <translation>Предобработка</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="204"/>
+        <source>Linear Filter Node</source>
+        <translation>Линейная фильтрация</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="205"/>
+        <source>Beamformer Node</source>
+        <translation>Бимформер</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="206"/>
+        <source>Envelope Extractor Node</source>
+        <translation>Огибающая</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="207"/>
+        <source>Brain Viewer Node</source>
+        <translation>Отображение мозга</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="208"/>
+        <source>ICA Rejection Node</source>
+        <translation>Удаление артефактов (ICA)</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="209"/>
+        <source>MNE Node</source>
+        <translation>MNE</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="210"/>
+        <source>MCE Node</source>
+        <translation>MCE</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="211"/>
+        <source>Signal Viewer Node</source>
+        <translation>Отображение сигналов</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="212"/>
+        <source>LSL Stream Output Node</source>
+        <translation>Выходной LSL поток</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="213"/>
+        <source>File Output Node</source>
+        <translation>Выходной файл</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="214"/>
+        <source>Atlas Viewer Node</source>
+        <translation>Отображение атласа</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="215"/>
+        <source>Seed Coherence Node</source>
+        <translation>Когерентности с источником</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="216"/>
+        <source>Coherence Node</source>
+        <translation>Когерентности</translation>
     </message>
 </context>
 <context>
@@ -499,6 +579,56 @@
         <location filename="../cognigraph/gui/window.py" line="129"/>
         <source>Когерентности с источником</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="130"/>
+        <source>LSL stream Node</source>
+        <translation>Входной LSL поток</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="131"/>
+        <source>ICA Rejection Node</source>
+        <translation>Удаление артефактов (ICA)</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="132"/>
+        <source>MNE Node</source>
+        <translation>MNE</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="133"/>
+        <source>MCE Node</source>
+        <translation>MCE</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="134"/>
+        <source>LSL Stream Output Node</source>
+        <translation>Выходной LSL поток</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="135"/>
+        <source>Signal Viewer Node</source>
+        <translation>Отображение сигналов</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="136"/>
+        <source>File Output Node</source>
+        <translation>Выходной файл</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="137"/>
+        <source>Atlas Viewer Node</source>
+        <translation>Отображение атласа</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="138"/>
+        <source>Seed Coherence Node</source>
+        <translation>Когерентности с источником</translation>
+    </message>
+    <message>
+        <location filename="../cognigraph/gui/window.py" line="139"/>
+        <source>Coherence Node</source>
+        <translation>Когерентности</translation>
     </message>
     <message>
         <location filename="../cognigraph/gui/controls.py" line="293"/>

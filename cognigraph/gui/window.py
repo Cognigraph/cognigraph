@@ -57,7 +57,7 @@ class GUIWindow(QMainWindow):
         self.setWindowIcon(QIcon(':/cognigraph_icon.png'))
 
     def init_translator(self):
-        print('Loading translation file:', self.translator.load('../translate/tr_eng.qm'))
+        print('Loading translation file:', self.translator.load('F:/Cognigraph/cognigraph/translate/tr_eng.qm'))
         self._app.installTranslator(self.translator)
         # self._app.translate("QDockWidget", "Processing pipeline setup")
         # self._app.translate("QDockWidget", "Настройка конвейера")
@@ -378,7 +378,7 @@ class GUIWindow(QMainWindow):
             return
         self.language = 'eng'
         self._app.removeTranslator(self.translator)
-        print('Loading translation file:', self.translator.load('../translate/tr_eng.qm'))
+        print('Loading translation file:', self.translator.load('F:/Cognigraph/cognigraph/translate/tr_eng.qm'))
         self._app.installTranslator(self.translator)
 
     def _set_russian(self):
@@ -386,7 +386,7 @@ class GUIWindow(QMainWindow):
             return
         self.language = 'ru'
         self._app.removeTranslator(self.translator)
-        print('Loading translation file:', self.translator.load('../translate/tr_ru.qm'))
+        print('Loading translation file:', self.translator.load('F:/Cognigraph/cognigraph/translate/tr_ru.qm'))
         self._app.installTranslator(self.translator)
 
     def translateUI(self):

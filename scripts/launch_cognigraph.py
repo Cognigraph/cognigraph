@@ -1,3 +1,4 @@
+#! python3
 """Launch main cognigraph gui window"""
 
 import argparse

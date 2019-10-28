@@ -1,0 +1,7 @@
+Собирауем инфу из py файла
+pylupdate5 *path to py1* *path to py2* *path to py3* -ts *ts filename*
+
+Редактируем ts файл в нотпаде
+
+Преобразуем .ts файл в .qm
+lrelease *path to ts*
